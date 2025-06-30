@@ -5,8 +5,8 @@
 #define LED_BUILTIN 2
 #endif
 
-#define DAC_PIN 25  // GPIO25 (DAC1)
-#define DAC_PIN2 26 // GPIO26 (DAC2)
+#define DAC1_PIN 25  // GPIO25 (DAC1)
+#define DAC2_PIN 26 // GPIO26 (DAC2)
 
 #define SINE_LOOKUP_TABLE_SIZE 128
 
@@ -38,19 +38,23 @@ void uartTask(void *pvParameters)
 
 void dacTask(void *pvParameters)
 {
-    uint8_t sineTable[SINE_LOOKUP_TABLE_SIZE];
+    uint8_t sineLookupTable[SINE_LOOKUP_TABLE_SIZE];
     for (int i = 0; i < SINE_LOOKUP_TABLE_SIZE; ++i)
     {
-        // Generate values from 0 to 255 (8-bit DAC)
-        sineTable[i] = (uint8_t)(127.5 * (sin(2 * M_PI * i / SINE_LOOKUP_TABLE_SIZE) + 1));
+        sineLookupTable[i] = (uint8_t)(127.5 * (sin(2 * M_PI * i / SINE_LOOKUP_TABLE_SIZE) + 1));
     }
     int idx = 0;
     while (1)
     {
-        dacWrite(DAC_PIN, sineTable[idx]);
-        dacWrite(DAC_PIN2, sineTable[idx]);
+        uint8_t val = sineLookupTable[idx];
+
+        // Reduced resolution to avoid hardware bug on this DAC
+        dacWrite(DAC1_PIN, val / 2);
+        // Full precision on other DAC that is unaffected
+        dacWrite(DAC2_PIN, val);
+
         idx = (idx + 1) % SINE_LOOKUP_TABLE_SIZE;
-        vTaskDelay(1 / portTICK_PERIOD_MS); 
+        vTaskDelay(1 / portTICK_PERIOD_MS);
     }
 }
 
