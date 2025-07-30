@@ -9,7 +9,7 @@ void dacTask(void *pvParameters)
     // Configure ADC input pin
     pinMode(ADC_INPUT_PIN, INPUT);
 
-    while (1)
+    while (true)
     {
         int adcValue = analogRead(ADC_INPUT_PIN);
         // Scale 12-bit to 8-bit (0-255)

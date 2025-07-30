@@ -24,7 +24,7 @@ void ledTask(void *pvParameters)
     attachInterrupt(digitalPinToInterrupt(TOGGLE_PIN), toggleISR, CHANGE);
 
     bool ledState = false;
-    for (;;) {
+    while (true){
         if (emergencyStopTriggered) {
             emergencyStopTriggered = false;
             // Blink LED quickly 5 times
