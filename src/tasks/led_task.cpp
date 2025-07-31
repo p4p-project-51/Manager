@@ -6,11 +6,13 @@
 volatile bool emergencyStopTriggered = false;
 volatile bool toggleTriggered = false;
 
-void IRAM_ATTR emergencyStopISR() {
+void IRAM_ATTR emergencyStopISR()
+{
     emergencyStopTriggered = true;
 }
 
-void IRAM_ATTR toggleISR() {
+void IRAM_ATTR toggleISR()
+{
     toggleTriggered = true;
 }
 
@@ -24,18 +26,22 @@ void ledTask(void *pvParameters)
     attachInterrupt(digitalPinToInterrupt(TOGGLE_PIN), toggleISR, CHANGE);
 
     bool ledState = false;
-    while (true){
-        if (emergencyStopTriggered) {
+    while (true)
+    {
+        if (emergencyStopTriggered)
+        {
             emergencyStopTriggered = false;
             // Blink LED quickly 5 times
-            for (int i = 0; i < 5; ++i) {
+            for (int i = 0; i < 5; ++i)
+            {
                 digitalWrite(LED_BUILTIN, HIGH);
                 vTaskDelay(100 / portTICK_PERIOD_MS);
                 digitalWrite(LED_BUILTIN, LOW);
                 vTaskDelay(100 / portTICK_PERIOD_MS);
             }
         }
-        if (toggleTriggered) {
+        if (toggleTriggered)
+        {
             toggleTriggered = false;
             ledState = !ledState;
             digitalWrite(LED_BUILTIN, ledState ? HIGH : LOW);
