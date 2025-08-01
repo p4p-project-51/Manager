@@ -19,6 +19,7 @@ void pollAds1x15Task(void *pvParameters)
     for (uint8_t i = 0; i < num_modules; ++i)
     {
         ads1015_modules[i].begin(ads_addresses[i]);
+        ads1015_modules[i].setGain(GAIN_TWO); // Set gain to 2x
     }
 
     while (true)
