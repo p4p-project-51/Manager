@@ -1,6 +1,7 @@
 #include <Wire.h>
 #include <Adafruit_ADS1X15.h>
 #include "tasks/ads1x15_task.h"
+#include "tasks/adc_send.h"
 
 Adafruit_ADS1015 ads1015_modules[4];
 const uint8_t ads_addresses[4] = {0x48, 0x49, 0x4A, 0x4B};
@@ -30,19 +31,10 @@ void pollAds1x15Task(void *pvParameters)
             for (uint8_t mod = 0; mod < num_modules; ++mod)
             {
                 int16_t adc = ads1015_modules[mod].readADC_SingleEnded(ch);
-
-                Serial.print("ADC");
-                Serial.print(mod);
-                Serial.print("_CH");
-                Serial.print(ch);
-                Serial.print(": ");
-                Serial.print(adc);
-                Serial.print("\t");
+                AdcSample sample = {mod, ch, adc};
+                sendSample(sample);
             }
-            Serial.println();
         }
-
-        Serial.println();
         vTaskDelay(1 / portTICK_PERIOD_MS);
     }
 }

@@ -1,4 +1,14 @@
 #include "tasks/uart_task.h"
+#include <Arduino.h>
+#include <queue>
+#include <string>
+
+std::queue<String> uartQueue;
+
+void uartSend(const char *msg)
+{
+    uartQueue.push(String(msg));
+}
 
 void uartTask(void *pvParameters)
 {
@@ -6,7 +16,11 @@ void uartTask(void *pvParameters)
 
     while (true)
     {
-        Serial.println("Hello!");
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        while (!uartQueue.empty())
+        {
+            Serial.println(uartQueue.front());
+            uartQueue.pop();
+        }
+        vTaskDelay(1 / portTICK_PERIOD_MS);
     }
 }
