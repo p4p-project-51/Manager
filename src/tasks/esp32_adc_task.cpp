@@ -7,6 +7,7 @@ const uint8_t esp32_adc_channel = 0; // GPIO36 (VP) is ADC1 channel 0
 void pollEsp32AdcTask(void *pvParameters)
 {
     Serial.begin(115200);
+
     while (true)
     {
         int adc_value = analogRead(esp32_adc_channel);
