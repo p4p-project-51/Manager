@@ -25,12 +25,27 @@ void pollAds1x15Task(void *pvParameters)
 
     while (true)
     {
-        // Changing the data rate from the default 1600 SPS (either way) seems to negatively affect the readings
         for (uint8_t ch = 0; ch < num_channels; ++ch)
         {
+            // Start conversion for all modules
             for (uint8_t mod = 0; mod < num_modules; ++mod)
             {
-                int16_t adc = ads1015_modules[mod].readADC_SingleEnded(ch);
+                ads1015_modules[mod].startADCReading(MUX_BY_CHANNEL[ch], /*continuous=*/false);
+            }
+
+            // From https://github.com/sparkfun/SparkFun_ADS1015_Arduino_Library/blob/d777dd3083447b3da41d429cffdc90d3cd1109ca/src/SparkFun_ADS1015_Arduino_Library.cpp#L487
+            vTaskDelay(1 / portTICK_PERIOD_MS);
+
+            // Poll for completion and read results
+            for (uint8_t mod = 0; mod < num_modules; ++mod)
+            {
+                // Wait for conversion to complete, but yield to avoid busy-waiting
+                while (!ads1015_modules[mod].conversionComplete())
+                {
+                    vTaskDelay(1 / portTICK_PERIOD_MS);
+                }
+
+                int16_t adc = ads1015_modules[mod].getLastConversionResults();
                 AdcSample sample = {mod, ch, adc};
                 sendSample(sample);
             }
