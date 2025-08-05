@@ -15,7 +15,7 @@ BLEUUID CHARACTERISTIC_UUID((uint16_t)0xFFE1);
 
 BLECharacteristic *pCharacteristic;
 
-class MyCallbacks : public BLECharacteristicCallbacks
+class CustomBLECharacteristicCallbacks : public BLECharacteristicCallbacks
 {
     // Received data from BLE UART
     void onWrite(BLECharacteristic *pCharacteristic)
@@ -35,6 +35,20 @@ class MyCallbacks : public BLECharacteristicCallbacks
             pCharacteristic->setValue(value + "\n");
             pCharacteristic->notify();
         }
+    }
+};
+
+class CustomBLEServerCallbacks : public BLEServerCallbacks
+{
+    void onConnect(BLEServer *pServer) override
+    {
+        Serial.println("BLE client connected");
+    }
+    void onDisconnect(BLEServer *pServer) override
+    {
+        Serial.println("BLE client disconnected, restarting advertising");
+        BLEAdvertising *pAdvertising = pServer->getAdvertising();
+        pAdvertising->start();
     }
 };
 
@@ -63,10 +77,11 @@ void uartTask(void *pvParameters)
     BLEDevice::init(BLE_NAME);
 
     BLEServer *pServer = BLEDevice::createServer();
-    BLEService *pService = pServer->createService(SERVICE_UUID);
+    pServer->setCallbacks(new CustomBLEServerCallbacks());
 
+    BLEService *pService = pServer->createService(SERVICE_UUID);
     pCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_NOTIFY);
-    pCharacteristic->setCallbacks(new MyCallbacks());
+    pCharacteristic->setCallbacks(new CustomBLECharacteristicCallbacks());
     pCharacteristic->addDescriptor(new BLE2902());
     pService->start();
 
