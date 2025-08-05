@@ -6,7 +6,7 @@
 Adafruit_ADS1015 ads1015_modules[4];
 const uint8_t ads_addresses[4] = {0x48, 0x49, 0x4A, 0x4B};
 const uint8_t num_modules = 4;
-const uint8_t num_channels = 1;
+const uint8_t num_channels = 4;
 
 // Addresses:
 // ADDR -> GND 0x48 (default for unconnected ADDR pin)
@@ -35,6 +35,7 @@ void pollAds1x15Task(void *pvParameters)
                 sendSample(sample);
             }
         }
-        vTaskDelay(1 / portTICK_PERIOD_MS);
+
+        vTaskDelay(500 / portTICK_PERIOD_MS);
     }
 }
