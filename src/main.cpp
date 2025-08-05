@@ -10,12 +10,12 @@
 void setup()
 {
     // xTaskCreatePinnedToCore(ledTask, "LED Task", 2048, NULL, 1, &ledTaskHandle, 0);
-    xTaskCreatePinnedToCore(uartTask, "UART Task", 2048, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(uartTask, "UART Task", 4096, NULL, 1, NULL, 1);
     // xTaskCreatePinnedToCore(dacTask, "DAC Task", 2048, NULL, 1, &dacTaskHandle, 1);
     // xTaskCreatePinnedToCore(uartEchoTask, "UART Echo Task", 2048, NULL, 1, &uartEchoTaskHandle, 1);
 
-    xTaskCreate(pollAds1x15Task, "ADS1015 Polling Task", 4096, NULL, 1, NULL);
-    // xTaskCreate(pollEsp32AdcTask, "ESP32 ADC Polling Task", 2048, NULL, 1, NULL);
+    // xTaskCreate(pollAds1x15Task, "ADS1015 Polling Task", 4096, NULL, 1, NULL);
+    xTaskCreate(pollEsp32AdcTask, "ESP32 ADC Polling Task", 2048, NULL, 1, NULL);
 }
 
 void loop()
