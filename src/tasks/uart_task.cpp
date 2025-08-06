@@ -31,6 +31,14 @@ class CustomBLECharacteristicCallbacks : public BLECharacteristicCallbacks
             }
             Serial.println();
 
+            // Check for reboot command
+            if (value == "{command: \"reboot\"}")
+            {
+                Serial.println("Reboot command received. Rebooting ESP32...");
+                ESP.restart();
+                return;
+            }
+
             // Echo back with newline for BLE terminal compatibility
             pCharacteristic->setValue(value + "\n");
             pCharacteristic->notify();
