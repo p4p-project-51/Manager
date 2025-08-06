@@ -5,6 +5,7 @@
 #include "tasks/uart_task.h"
 #include <vector>
 #include <ArduinoJson.h>
+#include <esp_system.h>
 
 Adafruit_ADS1015 ads1015_modules[4];
 const uint8_t ads_addresses[4] = {0x48, 0x49, 0x4A, 0x4B};
@@ -23,7 +24,8 @@ void generateBatchFirmwareId()
     char buf[10];
     for (int i = 0; i < 9; ++i)
     {
-        buf[i] = charset[random(0, sizeof(charset) - 2)];
+        uint32_t rnd = esp_random();
+        buf[i] = charset[rnd % (sizeof(charset) - 1)];
     }
     buf[9] = '\0';
     batchFirmwareId = String(buf);
