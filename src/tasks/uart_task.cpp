@@ -60,11 +60,18 @@ void uartSend(const char *msg)
 void uartSendBluetooth(const String &msg)
 {
     const size_t maxLen = 64;
-    String outMsg = msg.substring(0, maxLen) + "\n";
-    if (pCharacteristic)
+    size_t msgLen = msg.length();
+    for (size_t i = 0; i < msgLen; i += maxLen)
     {
-        pCharacteristic->setValue(std::string(outMsg.c_str()));
-        pCharacteristic->notify();
+        bool isLast = (i + maxLen >= msgLen);
+        String chunk = msg.substring(i, i + maxLen);
+        if (isLast)
+            chunk += "\n";
+        if (pCharacteristic)
+        {
+            pCharacteristic->setValue(std::string(chunk.c_str()));
+            pCharacteristic->notify();
+        }
     }
 }
 

@@ -2,6 +2,7 @@
 #include <Adafruit_ADS1X15.h>
 #include "tasks/ads1x15_task.h"
 #include "tasks/adc_send.h"
+#include "tasks/uart_task.h"
 
 Adafruit_ADS1015 ads1015_modules[4];
 const uint8_t ads_addresses[4] = {0x48, 0x49, 0x4A, 0x4B};
@@ -25,6 +26,7 @@ void pollAds1x15Task(void *pvParameters)
 
     while (true)
     {
+        String batchLine;
         for (uint8_t ch = 0; ch < num_channels; ++ch)
         {
             // Start conversion for all modules
@@ -46,11 +48,15 @@ void pollAds1x15Task(void *pvParameters)
                 }
 
                 int16_t adc = ads1015_modules[mod].getLastConversionResults();
-                AdcSample sample = {mod, ch, adc};
-                sendSample(sample);
+                char buf[32];
+                snprintf(buf, sizeof(buf), "M%d:C%d:V%d", mod, ch, adc);
+                if (!batchLine.isEmpty())
+                    batchLine += " ";
+                batchLine += buf;
             }
         }
 
+        uartSend(batchLine.c_str());
         vTaskDelay(500 / portTICK_PERIOD_MS);
     }
 }
